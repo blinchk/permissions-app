@@ -1,44 +1,59 @@
 package com.laus.permissions.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.laus.permissions.exception.ChainEndException;
 
 import javax.persistence.*;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
-@Table(name = "permission")
+@Table(name = "permission", uniqueConstraints = { @UniqueConstraint(columnNames = {"id"}) })
 public class Permission {
-    @GeneratedValue
     @Id
     @Column(name = "id", nullable = false)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "parent_id", nullable = true)
+    private String name;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parentId")
+    @JsonBackReference
     private Permission parent;
 
-    @OneToOne
-    @JoinColumn(name = "children_id", nullable = true)
-    private Permission children;
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Permission> children;
 
-    public Permission() {
-
+    public Long getId() {
+        return id;
     }
 
-    public Permission(Permission parent) {
+    public Permission getParent() {
+        return parent;
+    }
+
+    public void setParent(Permission parent) {
         this.parent = parent;
     }
 
-    public Permission getChildren() {
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    private boolean isLastInTheChain() {
+        if (getParent() == null) return false;
+        else if (getParent().getParent() == null) return false;
+        else return getParent().getParent().getParent() != null;
+    }
+
+    public List<Permission> getChildren() {
         return children;
-    }
-
-    public void setChildren(Permission children) {
-        if (isLastInTheChain()) throw new ChainEndException();
-        this.children = children;
-    }
-
-    public boolean isLastInTheChain() {
-        if (parent == null) return false;
-        else return parent.parent != null;
     }
 }
