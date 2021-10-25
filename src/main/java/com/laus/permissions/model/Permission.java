@@ -21,24 +21,11 @@ public class Permission {
     @Column(nullable = false)
     private String name;
 
-    @ManyToOne(cascade = {CascadeType.MERGE})
+    @ManyToOne(cascade = { CascadeType.MERGE })
     private Permission parent;
 
     @OneToMany(mappedBy = "parent")
     private List<Permission> children;
-
-    public Permission() {
-    }
-
-    public Permission(String name) {
-        this.name = name;
-    }
-
-    public Permission(String name, Permission parent) {
-        this.name = name;
-        this.parent = parent;
-        if (!isCanBeInitialized()) throw new ChainEndException();
-    }
 
     public Long getId() {
         return id;
@@ -71,5 +58,17 @@ public class Permission {
             return getParent().getParent().getParent() == null;
         }
         return true;
+    }
+
+    public Permission() {}
+
+    public Permission(String name) {
+        this.name = name;
+    }
+
+    public Permission(String name, Permission parent) {
+        this.name = name;
+        this.parent = parent;
+        if (!isCanBeInitialized()) throw new ChainEndException();
     }
 }
