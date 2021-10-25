@@ -1,4 +1,4 @@
-# permissions-app
+# Permissions Front-End Application
 
 ## Project setup
 ```

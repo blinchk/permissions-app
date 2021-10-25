@@ -1,5 +1,5 @@
 export default interface Permission {
-  id: number;
+  id?: number;
   name: string;
-  parent: Permission;
+  parent: Permission | null;
 }

@@ -9,7 +9,7 @@
           <tr>
             <th>ID</th>
             <th>Name</th>
-            <th>Parent ID</th>
+            <th>Parent</th>
           </tr>
         </thead>
         <tbody>
@@ -37,9 +37,9 @@ export default class PermissionsView extends Vue {
   parentString(permission: Permission): string {
     if (permission.parent) {
       if (permission.parent.parent) {
-        return `${permission.parent.id} > ${permission.parent.parent.id}`;
+        return `${permission.parent.parent.id} - ${permission.parent.parent.name} >> ${permission.parent.id} - ${permission.parent.name}`;
       }
-      return permission.parent.id.toString();
+      return `${permission.parent.id} - ${permission.parent.name}`;
     }
     return "None";
   }
