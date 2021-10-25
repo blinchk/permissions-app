@@ -1,18 +1,12 @@
 package com.laus.permissions.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.laus.permissions.exception.ChainEndException;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 
 import javax.persistence.*;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Table(name = "permission", uniqueConstraints = {@UniqueConstraint(columnNames = {"id"})})
@@ -54,9 +48,27 @@ public class Permission {
     }
 
     @JsonIgnore
-    public boolean isNotLastInTheChain() {
-        if (getParent() == null) return true;
-        else if (getParent().getParent() == null) return true;
-        else return getParent().getParent().getParent() != null;
+    public boolean isCannotBeAddedToChain() {
+        if (getParent() == null) return false;
+        return getParent().getParent() != null;
+    }
+
+    private boolean isCanBeInitialized() {
+        if (isCannotBeAddedToChain()) {
+            return getParent().getParent().getParent() == null;
+        }
+        return true;
+    }
+
+    public Permission() {}
+
+    public Permission(String name) {
+        this.name = name;
+    }
+
+    public Permission(String name, Permission parent) {
+        this.name = name;
+        this.parent = parent;
+        if (!isCanBeInitialized()) throw new ChainEndException();
     }
 }

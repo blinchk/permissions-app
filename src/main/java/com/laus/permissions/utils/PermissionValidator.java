@@ -23,7 +23,7 @@ public class PermissionValidator implements Validator<Permission> {
         Long parentId = parent.getId();
         Optional<Permission> parentOptional = this.repository.findById(parentId);
         if (parentOptional.isPresent()) {
-            if (!parentOptional.get().isNotLastInTheChain()) {
+            if (parentOptional.get().isCannotBeAddedToChain()) {
                 throw new ChainEndException();
             }
         } else {
